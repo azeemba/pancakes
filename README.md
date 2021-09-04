@@ -8,3 +8,11 @@ make the website more mobile friendly.
 
 The app also stores StackExchange questions that are visited. On a long press,
 it will show a table with all the questions that were visited.
+
+This is how StackExchange looks on Mobile
+
+![Screenshot of StackExchange on Mobile](Pancake_browser.png)
+
+This is how the app looks:
+
+![Screenshot of Pancake app](Pancake_pancake.png)
