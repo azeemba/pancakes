@@ -2,6 +2,8 @@ package com.azeemba.pancakes
 
 import android.os.Build
 import android.os.Bundle
+import android.os.Debug
+import android.util.Log
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -14,10 +16,10 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.azeemba.pancakes.databinding.ActivityMainBinding
+import java.util.logging.Logger
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +55,9 @@ class MainActivity : AppCompatActivity() {
                 super.onPageFinished(view, _url)
                 if (_url == url) {
                     x.evaluateJavascript(script) {}
+                }
+                else {
+                    Logger.getLogger("Pancake").info("Visited: $_url")
                 }
             }
         }
