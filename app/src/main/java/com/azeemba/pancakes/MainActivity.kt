@@ -1,34 +1,43 @@
 package com.azeemba.pancakes
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
-import android.os.Debug
-import android.util.Log
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.room.Room.databaseBuilder
 import com.azeemba.pancakes.databinding.ActivityMainBinding
 import java.util.logging.Logger
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var webview: WebView
 
+    private lateinit var db: Storage
+
+    private fun makeDb(): Storage {
+        return databaseBuilder(
+            applicationContext,
+            Storage::class.java, "azeemba.pancakes.storage"
+        ).build()
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        db = makeDb()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val url = "https://stackexchange.com/"
+        val stackUrl = "https://stackexchange.com/"
         val script = """
             x = document.getElementsByTagName('head')[0]
             y = document.createElement('meta')
@@ -45,25 +54,35 @@ class MainActivity : AppCompatActivity() {
             doAll("question")
         """.trimIndent()
 
-        val x = findViewById<WebView>(R.id.webview)
-        x.settings.javaScriptEnabled = true
+        webview = findViewById(R.id.webview)
+        webview.settings.javaScriptEnabled = true
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            x.settings.forceDark = WebSettings.FORCE_DARK_ON
+            webview.settings.forceDark = WebSettings.FORCE_DARK_ON
         }
-        x.webViewClient = object: WebViewClient() {
-            override fun onPageFinished(view: WebView?, _url: String?) {
-                super.onPageFinished(view, _url)
-                if (_url == url) {
-                    x.evaluateJavascript(script) {}
+        webview.webViewClient = object: WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                val log = Logger.getLogger("Pancakes")
+                val title = webview.title
+                if (url != null && title != null) {
+                    val visit = makeNowVisit(url, title)
+
+                    val stackDomain = "stackexchange"
+                    if (visit.community == stackDomain) webview.evaluateJavascript(script) {}
+                    else {
+                        Thread(Runnable {
+                            db.visitDao().insert(visit)
+                            log.info(visit.toString())
+                        }).start()
+                    }
                 }
                 else {
-                    Logger.getLogger("Pancake").info("Visited: $_url")
+                    log.info("Something was null: url - $url title - $title")
                 }
+                super.onPageFinished(view, url)
             }
         }
 
-        x.canGoBack()
-        x.loadUrl(url)
+        webview.loadUrl(stackUrl)
 
 //        setSupportActionBar(binding.toolbar)
 
@@ -90,6 +109,13 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onBackPressed() {
+        when {
+            webview.canGoBack() -> webview.goBack()
+            else -> super.onBackPressed()
         }
     }
 
