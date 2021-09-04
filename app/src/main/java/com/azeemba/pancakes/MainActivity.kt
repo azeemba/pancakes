@@ -14,6 +14,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.room.Room.databaseBuilder
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.azeemba.pancakes.databinding.ActivityMainBinding
 import java.util.logging.Logger
 
@@ -59,6 +60,9 @@ class MainActivity : AppCompatActivity() {
         """.trimIndent()
 
         webview = findViewById(R.id.webview)
+        var swipe = findViewById<SwipeRefreshLayout>(R.id.swiperefresh)
+
+        swipe.setOnRefreshListener { webview.reload() }
         webview.settings.javaScriptEnabled = true
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             webview.settings.forceDark = WebSettings.FORCE_DARK_ON
@@ -81,6 +85,8 @@ class MainActivity : AppCompatActivity() {
                 else {
                     log.info("Something was null: url - $url title - $title")
                 }
+
+                if (swipe.isRefreshing) swipe.isRefreshing = false
                 super.onPageFinished(view, url)
             }
         }
@@ -102,6 +108,7 @@ class MainActivity : AppCompatActivity() {
             Snackbar.make(view, "${webview.originalUrl} copied", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
