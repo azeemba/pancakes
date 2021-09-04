@@ -1,12 +1,15 @@
 package com.azeemba.pancakes
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.*
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -30,6 +33,7 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
+        val log = Logger.getLogger("Pancakes")
         super.onCreate(savedInstanceState)
 
         db = makeDb()
@@ -61,7 +65,6 @@ class MainActivity : AppCompatActivity() {
         }
         webview.webViewClient = object: WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
-                val log = Logger.getLogger("Pancakes")
                 val title = webview.title
                 if (url != null && title != null) {
                     val visit = makeNowVisit(url, title)
@@ -82,17 +85,22 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        webview.setOnLongClickListener {
+            log.info("In long click")
+            val intent = Intent(webview.context, VisitListView::class.java)
+            startActivity(intent)
+            false
+        }
+
         webview.loadUrl(stackUrl)
 
-//        setSupportActionBar(binding.toolbar)
-
-//        val navController = findNavController(R.id.nav_host_fragment_content_main)
-//        appBarConfiguration = AppBarConfiguration(navController.graph)
-//        setupActionBarWithNavController(navController, appBarConfiguration)
-
         binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("Pancake page", webview.originalUrl)
+            clipboard.setPrimaryClip(clip)
+
+            Snackbar.make(view, "${webview.originalUrl} copied", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show()
         }
     }
 
@@ -118,10 +126,4 @@ class MainActivity : AppCompatActivity() {
             else -> super.onBackPressed()
         }
     }
-
-//    override fun onSupportNavigateUp(): Boolean {
-//        val navController = findNavController(R.id.nav_host_fragment_content_main)
-//        return navController.navigateUp(appBarConfiguration)
-//                || super.onSupportNavigateUp()
-//    }
 }
