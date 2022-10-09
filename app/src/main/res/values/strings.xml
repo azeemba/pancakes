@@ -100,4 +100,5 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="copy_link">Copy Link</string>
+    <string name="history">History</string>
 </resources>

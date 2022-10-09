@@ -2,9 +2,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.azeemba.pancakes.MainActivity">
+    <!-- "Mark Favorite", should appear as action button if possible -->
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/action_history"
+        android:icon="@android:drawable/ic_menu_recent_history"
+        android:title="@string/history"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_copy_link"
+        android:icon="?attr/actionModeCopyDrawable"
+        android:title="@string/copy_link"
+        app:showAsAction="ifRoom" />
+
 </menu>

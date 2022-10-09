@@ -49,6 +49,10 @@ class MainActivity : AppCompatActivity() {
             y.name="viewport"
             y.content="width=device-width, initial-scale=1.0"
             x.appendChild(y)
+            
+            h = document.getElementsByTagName("header")
+            for (let i = h.length-1; i >= 0; --i) h[i].remove()
+            
             function unsetWidth(thing) { thing.style.width = 'auto'}
             function unsetAll(things) { for (let i = 0; i < things.length; ++i) unsetWidth(things[i])}
             function doAll(match) {unsetAll(document.getElementsByClassName(match))}
@@ -67,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             webview.settings.forceDark = WebSettings.FORCE_DARK_ON
         }
-        webview.webViewClient = object: WebViewClient() {
+        webview.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 val title = webview.title
                 if (url != null && title != null) {
@@ -81,8 +85,7 @@ class MainActivity : AppCompatActivity() {
                             log.info(visit.toString())
                         }).start()
                     }
-                }
-                else {
+                } else {
                     log.info("Something was null: url - $url title - $title")
                 }
 
@@ -91,23 +94,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        webview.setOnLongClickListener {
-            log.info("In long click")
-            val intent = Intent(webview.context, VisitListView::class.java)
-            startActivity(intent)
-            false
-        }
-
         webview.loadUrl(stackUrl)
 
-        binding.fab.setOnClickListener { view ->
-            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = ClipData.newPlainText("Pancake page", webview.originalUrl)
-            clipboard.setPrimaryClip(clip)
-
-            Snackbar.make(view, "${webview.originalUrl} copied", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
+        setSupportActionBar(findViewById(R.id.toolbar))
 
     }
 
@@ -123,6 +112,20 @@ class MainActivity : AppCompatActivity() {
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_settings -> true
+            R.id.action_history -> {
+                val intent = Intent(this, VisitListView::class.java)
+                startActivity(intent)
+                true
+            }
+            R.id.action_copy_link -> {
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("Pancake page", webview.originalUrl)
+                clipboard.setPrimaryClip(clip)
+
+                Snackbar.make(webview, "${webview.originalUrl} copied", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
