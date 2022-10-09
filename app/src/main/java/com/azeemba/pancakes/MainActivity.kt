@@ -126,6 +126,25 @@ class MainActivity : AppCompatActivity() {
                     .setAction("Action", null).show()
                 true
             }
+            R.id.action_export_history -> {
+                Thread {
+                    val items = db.visitDao().getAll()
+                    val historyCsv =
+                        items.joinToString(
+                            separator = "\n",
+                            transform = { item ->
+                                "${item.timestamp}, \"${item.title}\", ${item.community}, \"${item.url}\"" })
+                    val sendIntent: Intent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, historyCsv)
+                        type = "text/plain"
+                    }
+
+                    val shareIntent = Intent.createChooser(sendIntent, null)
+                    startActivity(shareIntent)
+                }.start()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

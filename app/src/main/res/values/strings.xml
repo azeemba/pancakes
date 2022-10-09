@@ -101,4 +101,5 @@
     </string>
     <string name="copy_link">Copy Link</string>
     <string name="history">History</string>
+    <string name="export_history">Export History</string>
 </resources>
