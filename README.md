@@ -13,4 +13,4 @@ Here are two screenshots that show the difference. The website is loaded
 in a mobile browser on the left. On the right is the app that
 shows the same website but with far more legible content size.
 
-![Screenshot of Pancake app](Pancacke_Combined_Screenshot.png)
+![Demo Video](pancakes-demo-smalls.mp4)
