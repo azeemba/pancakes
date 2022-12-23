@@ -13,4 +13,7 @@ Here are two screenshots that show the difference. The website is loaded
 in a mobile browser on the left. On the right is the app that
 shows the same website but with far more legible content size.
 
-![Demo Video](pancakes-demo-smalls.mp4)
+
+
+https://user-images.githubusercontent.com/2160795/209409607-68c2cb1a-b0f4-4e3a-960f-62c5be6853b0.mp4
+
